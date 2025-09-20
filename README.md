@@ -1,6 +1,6 @@
 # Simulación de Blockchain en Real Estate – BlockEstateSim
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/juliadp/simu-blockchain/blob/main/TP%20Final%20Simulacion%20OK.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/juliadp/simu-blockchain/blob/main/TP%20Final%20Simulacion.ipynb)
 
 📚 **Descripción del Proyecto**  
 Este proyecto simula el proceso de **tokenización de propiedades en blockchain**, modelando los eventos principales:  
