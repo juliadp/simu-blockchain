@@ -1,0 +1,17 @@
+digraph Tokenizacion {
+  rankdir=TB;
+  node [shape=rect, style=rounded];
+
+  start [shape=circle, label="Inicio"];
+  check_parts [label="¿partes_de_prop > len(tokens_vend)?"];
+  check_gas [label="¿saldo_vend >= GAS?"];
+  do_mint [label="TM: mint\n- saldo_vend -= GAS\n- tokens_vend += {id, precio}"];
+  end [shape=doublecircle, label="Fin"];
+
+  start -> check_parts;
+  check_parts -> check_gas [label="Sí"];
+  check_parts -> end [label="No"];
+  check_gas -> do_mint [label="Sí"];
+  check_gas -> end [label="No"];
+  do_mint -> end;
+}

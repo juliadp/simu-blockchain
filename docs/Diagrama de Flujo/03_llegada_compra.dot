@@ -1,0 +1,25 @@
+digraph LlegadaCompra {
+  rankdir=TB;
+  node [shape=rect, style=rounded];
+
+  start [shape=circle, label="Inicio"];
+  llegada [label="TLLI: llegada_interesado"];
+  kyc [label="¿KYC aprobado?"];
+  hay_tokens [label="¿tokens_vend no vacío?"];
+  elige [label="Elegir token"];
+  fondos [label="¿saldo_comp >= precio(token)?"];
+  compra [label="TCI: compra_exitosa\n- saldo_comp -= precio\n- saldo_vend += precio\n- remover token"];
+  fallo_fondos [label="compra_fallida_fondos"];
+  fallo_sin_tokens [label="compra_fallida_sin_tokens"];
+  fin [shape=doublecircle, label="Fin"];
+
+  start -> llegada -> kyc;
+  kyc -> hay_tokens [label="Sí"];
+  kyc -> fin [label="No"];
+  hay_tokens -> elige [label="Sí"];
+  hay_tokens -> fallo_sin_tokens [label="No"];
+  elige -> fondos;
+  fondos -> compra [label="Sí"];
+  fondos -> fallo_fondos [label="No"];
+  {compra, fallo_fondos, fallo_sin_tokens} -> fin;
+}

@@ -1,7 +1,0 @@
-# src/config/config.py
-GAS = 50
-VALOR_TOKEN_MEDIA = 1000
-VALOR_TOKEN_SD = 200
-N_EVENTOS = 1000
-P_BURN = 0.05
-P_UPDATE = 0.10

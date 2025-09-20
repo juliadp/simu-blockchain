@@ -1,0 +1,18 @@
+digraph Secundarios {
+  rankdir=LR;
+  node [shape=rect, style=rounded];
+  start [shape=circle, label="Inicio"];
+  wait [label="Tiempo ~ Expon(3)"];
+  pick [label="Seleccionar token aleatorio (si existe)"];
+  decide [label="u ~ U(0,1)"];
+  burn [label="TBT: burn_token\n- remover token\n- tokens_burneados++"];
+  update [label="TAP: actualizacion_precio\n- token.precio = f(Normal)"];
+  skip [label="Sin cambios"];
+  fin [shape=doublecircle, label="Fin"];
+
+  start -> wait -> pick -> decide;
+  decide -> burn [label="u < P_BURN"];
+  decide -> update [label="P_BURN ≤ u < P_BURN+P_UPDATE"];
+  decide -> skip [label="sino"];
+  {burn, update, skip} -> fin;
+}

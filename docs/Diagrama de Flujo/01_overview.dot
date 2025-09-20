@@ -1,0 +1,54 @@
+digraph Overview {
+  rankdir=LR;
+  node [shape=rect, style=rounded];
+
+  subgraph cluster_market {
+    label="Mercado de Tokens (Blockchain)";
+    style=rounded;
+    Vendedor [label="Vendedor\n(saldo_vend)"];
+    Compradores [label="Interesados/Compradores\n(kyc, saldo)"];
+    Tokens [label="Listado de Tokens\n(tokens_vend)"];
+  }
+
+  subgraph cluster_events {
+    label="Eventos (TEF)";
+    style="dashed,rounded";
+    TTS [label="TTS: tokenizacion_solicitada"];
+    TM  [label="TM: mint"];
+    TLLI [label="TLLI: llegada_interesado"];
+    TCI [label="TCI: compra_interesado"];
+    TBT [label="TBT: burn_token"];
+    TAP [label="TAP: actualizacion_precio"];
+  }
+
+  # Flujos principales
+  TTS -> TM [label="si partes_de_prop > len(tokens_vend)\n y saldo_vend >= GAS"];
+  TLLI -> TCI [label="si kyc == True\n y saldo_comp >= precio(token)"];
+
+  # Efectos sobre el mercado
+  TM -> Tokens [label="agrega token"];
+  TCI -> Tokens [label="remueve token"];
+  TCI -> Vendedor [label="+precio"];
+  TAP -> Tokens [label="actualiza precio"];
+  TBT -> Tokens [label="elimina token"];
+
+  # Interacción de actores
+  Vendedor -> TTS;
+  Vendedor -> TAP;
+  Compradores -> TLLI;
+
+  # Métricas
+  subgraph cluster_metrics {
+    label="Métricas";
+    style="rounded";
+    CTS [shape=note, label="CTS"];
+    PTB [shape=note, label="PTB"];
+    PSC [shape=note, label="PSC"];
+    CTF [shape=note, label="CTF"];
+  }
+
+  TM -> CTS;
+  TBT -> PTB;
+  TCI -> PSC;
+  {TLLI TCI} -> CTF [style=dashed];
+}

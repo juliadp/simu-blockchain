@@ -1,0 +1,45 @@
+digraph EstadoMetricas {
+  rankdir=LR;
+  node [shape=rect, style=rounded];
+
+  subgraph cluster_state {
+    label="Estado";
+    style="rounded";
+    partes [label="partes_de_prop"];
+    tokens [label="tokens_vend"];
+    saldo [label="saldo_vend"];
+    compradores [label="saldos_compradores"];
+  }
+
+  subgraph cluster_events {
+    label="Eventos";
+    style="dashed,rounded";
+    TM  [label="TM"];
+    TCI [label="TCI"];
+    TBT [label="TBT"];
+    TAP [label="TAP"];
+  }
+
+  subgraph cluster_metrics {
+    label="Métricas";
+    style="rounded";
+    CTS [shape=note, label="CTS"];
+    PTB [shape=note, label="PTB"];
+    PSC [shape=note, label="PSC"];
+    CTF [shape=note, label="CTF"];
+  }
+
+  TM -> tokens [label="+{id,precio}"];
+  TM -> saldo  [label="-GAS"];
+  TM -> CTS;
+
+  TCI -> tokens [label="-{id}"];
+  TCI -> saldo  [label="+precio"];
+  TCI -> compradores [label="+saldo_remanente"];
+  TCI -> PSC;
+
+  TBT -> tokens [label="-{id}"];
+  TBT -> PTB;
+
+  TAP -> tokens [label="update precio"];
+}
