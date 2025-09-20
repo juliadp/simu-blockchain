@@ -13,8 +13,6 @@ A través de esta simulación se analizan métricas clave como la cantidad total
 
 📑 **Índice de la Estructura del Proyecto**
 
-Este documento describe la organización del repositorio y los principales componentes de la simulación.
-
 ---
 
 📂 **Estructura General**
@@ -54,7 +52,6 @@ simu-blockestate/
 📌 **Documentación y soporte**  
 - `README.md`: Explicación del proyecto y guía rápida de uso.  
 - `requirements.txt`: Dependencias necesarias para ejecutar el análisis localmente.  
-- `mejoras_resumen.txt`: Log de mejoras y generación automática de outputs.  
 
 ---
 
