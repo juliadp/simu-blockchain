@@ -1,0 +1,20 @@
+digraph Tokenizacion {
+  rankdir=TB;
+  node [shape=rect, style=rounded];
+
+  start  [shape=circle, label="Inicio"];
+  tts    [label="TTS: tokenizacion_solicitada"];
+  cap    [label="¿tokens_emitidos < partes_de_prop?"];
+  gas    [label="¿saldo_vend >= GAS?"];
+  mint   [label="TM: mint\n- saldo_vend -= GAS\n- tokens_emitidos++\n- push {id, precio} en tokens_vend\n- CTS++"];
+  fin    [shape=doublecircle, label="Fin"];
+
+  start -> tts -> cap;
+  cap -> gas   [label="Sí"];
+  cap -> fin   [label="No (capacidad)"];
+
+  gas -> mint  [label="Sí"];
+  gas -> fin   [label="No (gas insuficiente)"];
+
+  mint -> fin;
+}

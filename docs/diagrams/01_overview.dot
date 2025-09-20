@@ -5,9 +5,9 @@ digraph Overview {
   subgraph cluster_market {
     label="Mercado de Tokens (Blockchain)";
     style=rounded;
-    Vendedor [label="Vendedor\n(saldo_vend)"];
-    Compradores [label="Interesados/Compradores\n(kyc, saldo)"];
-    Tokens [label="Listado de Tokens\n(tokens_vend)"];
+    Vendedor   [label="Vendedor\n(saldo_vend)"];
+    Compradores[label="Interesados/Compradores\n(kyc, saldo)"];
+    Tokens     [label="Listado de Tokens\n(tokens_vend)"];
   }
 
   subgraph cluster_events {
@@ -15,26 +15,30 @@ digraph Overview {
     style="dashed,rounded";
     TTS [label="TTS: tokenizacion_solicitada"];
     TM  [label="TM: mint"];
-    TLLI [label="TLLI: llegada_interesado"];
+    TLLI[label="TLLI: llegada_interesado"];
     TCI [label="TCI: compra_interesado"];
+    CFF [label="compra_fallida_fondos"];
+    CST [label="compra_fallida_sin_tokens"];
     TBT [label="TBT: burn_token"];
     TAP [label="TAP: actualizacion_precio"];
   }
 
   # Flujos principales
-  TTS -> TM [label="si partes_de_prop > len(tokens_vend)\n y saldo_vend >= GAS"];
-  TLLI -> TCI [label="si kyc == True\n y saldo_comp >= precio(token)"];
+  TTS -> TM   [label="si tokens_emitidos < partes_de_prop\ny saldo_vend >= GAS"];
+  TLLI -> TCI [label="kyc==True, hay tokens,\n saldo_comp >= precio(token)"];
+  TLLI -> CST [label="sin tokens"];
+  TLLI -> CFF [label="fondos insuficientes"];
 
   # Efectos sobre el mercado
-  TM -> Tokens [label="agrega token"];
-  TCI -> Tokens [label="remueve token"];
+  TM  -> Tokens   [label="agrega token"];
+  TCI -> Tokens   [label="remueve token"];
   TCI -> Vendedor [label="+precio"];
-  TAP -> Tokens [label="actualiza precio"];
-  TBT -> Tokens [label="elimina token"];
+  TAP -> Tokens   [label="actualiza precio"];
+  TBT -> Tokens   [label="elimina token"];
 
   # Interacción de actores
-  Vendedor -> TTS;
-  Vendedor -> TAP;
+  Vendedor    -> TTS;
+  Vendedor    -> TAP;
   Compradores -> TLLI;
 
   # Métricas
@@ -47,8 +51,8 @@ digraph Overview {
     CTF [shape=note, label="CTF"];
   }
 
-  TM -> CTS;
+  TM  -> CTS;
   TBT -> PTB;
   TCI -> PSC;
-  {TLLI TCI} -> CTF [style=dashed];
+  {CFF CST} -> CTF;
 }

@@ -5,19 +5,21 @@ digraph EstadoMetricas {
   subgraph cluster_state {
     label="Estado";
     style="rounded";
-    partes [label="partes_de_prop"];
-    tokens [label="tokens_vend"];
-    saldo [label="saldo_vend"];
-    compradores [label="saldos_compradores"];
+    partes     [label="partes_de_prop"];
+    tokens     [label="tokens_vend"];
+    saldo      [label="saldo_vend"];
+    compradores[label="saldos_compradores"];
   }
 
   subgraph cluster_events {
     label="Eventos";
     style="dashed,rounded";
-    TM  [label="TM"];
-    TCI [label="TCI"];
-    TBT [label="TBT"];
-    TAP [label="TAP"];
+    TM  [label="TM (mint)"];
+    TCI [label="TCI (compra_exitosa)"];
+    CFF [label="compra_fallida_fondos"];
+    CST [label="compra_fallida_sin_tokens"];
+    TBT [label="TBT (burn_token)"];
+    TAP [label="TAP (actualizacion_precio)"];
   }
 
   subgraph cluster_metrics {
@@ -29,14 +31,17 @@ digraph EstadoMetricas {
     CTF [shape=note, label="CTF"];
   }
 
-  TM -> tokens [label="+{id,precio}"];
-  TM -> saldo  [label="-GAS"];
-  TM -> CTS;
+  TM  -> tokens [label="+{id,precio}"];
+  TM  -> saldo  [label="-GAS"];
+  TM  -> CTS;
 
   TCI -> tokens [label="-{id}"];
   TCI -> saldo  [label="+precio"];
   TCI -> compradores [label="+saldo_remanente"];
   TCI -> PSC;
+
+  CFF -> CTF;
+  CST -> CTF;
 
   TBT -> tokens [label="-{id}"];
   TBT -> PTB;
