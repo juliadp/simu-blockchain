@@ -28,7 +28,6 @@ El objetivo es analizar el **ritmo de oferta vs demanda**, la evolución del **s
   - [🔁 Flujo de la Simulación](#-flujo-de-la-simulación)
   - [📊 Métricas Principales](#-métricas-principales)
   - [🧾 Salidas y Resultados](#-salidas-y-resultados)
-  - [📐 Ajuste de FDPs y Verificación](#-ajuste-de-fdps-y-verificación)
   - [🎯 Notas de Reproducibilidad](#-notas-de-reproducibilidad)
   - [🛠 Guía rápida / Runbook](#-guía-rápida--runbook)
 
@@ -48,12 +47,11 @@ simu-blockchain/
 │   ├── tokens_circulacion.csv       # Serie (tiempo, tokens_en_circulacion)
 │   ├── tokens_circulacion.png       # Curva del supply acumulado
 │   ├── resumen_tiempo.csv           # t_min, t_max, duración, n_registros, tokens_final
-│   ├── ajuste_ts.png                # Resumen gráfico ajuste FDP para TS
-│   ├── ajuste_llin.png              # Resumen gráfico ajuste FDP para LLIN
 │   ├── metricas_bar.png             # Barras con métricas finales
 │   ├── saldo_vendedor_tiempo.png    # Evolución del saldo del vendedor
 │   ├── dist_saldos_compradores.png  # Histograma de saldos post-compra (si aplica)
-│   ├── ajustes_fdp.csv              # (opcional) Resumen de ajustes FDP (si se exporta)
+│   ├── ajustes_fdp.csv              # Resumen de ajustes FDP (TS y LLIN)
+│   ├── ajustes_fdp.json             # Igual que CSV, en formato JSON
 │   └── conclusiones.md              # Conclusiones automáticas de la corrida
 │
 └── .gitignore                       # Ignora cachés, checkpoints y temporales
@@ -87,8 +85,9 @@ Los resultados se guardan en `outputs/`.
 
 ## 🔁 Flujo de la Simulación
 - **Unidad de tiempo:** **días**  
-- **TS (intervalo entre tokenizaciones):** `Exponencial` con media ≈ **5 días**  
-- **LLIN (intervalo entre llegadas de interesados):** `Lognormal` (μ=2.5, σ=0.5) → media ≈ **13.8 días**, mediana ≈ **12.2 días**  
+- **TS (intervalo entre tokenizaciones):** calculado en la serie `tiempos_ts`  
+- **LLIN (intervalo entre llegadas de interesados):** calculado en la serie `tiempos_llin`  
+mediana ≈ **12.2 días**  
 - **Eventos secundarios:** gaps `Exponencial` con media ≈ **3 días**  
 - **Estados/Costos:** gasto de gas, saldo del vendedor, precios aleatorios de tokens, KYC del comprador, etc.
 
@@ -119,18 +118,17 @@ Estas métricas quedan en `outputs/metricas.csv` y se visualizan en `outputs/met
 
 ---
 
-## 📐 Ajuste de FDPs y Verificación
-- **Ajuste (solo con `fitter`):**  
+- **Ajuste (con `fitter`):**  
   Se ajustan distribuciones candidatas (`expon`, `gamma`, `lognorm`, `norm`, `weibull_min`) para:
-  - **TS (Δ entre mints)**  
-  - **LLIN (Δ entre compras)**  
+  - **`tiempos_ts`** (Δ entre mints)  
+  - **`tiempos_llin`** (Δ entre compras)  
 
-  Resúmenes gráficos:
-  - `outputs/ajuste_ts.png`  
-  - `outputs/ajuste_llin.png`
+  Los mejores ajustes se exportan en:
+  - `outputs/ajustes_fdp.csv`  
+  - `outputs/ajustes_fdp.json`
 
-- **Verificación:**  
-  Re-muestreo desde la **mejor FDP** hallada y re-ajuste para chequear coherencia del fit (al estilo del cuaderno del profesor). Resultados y figuras en `outputs/`.
+- **Uso en Conclusiones:**  
+  El bloque 10 reutiliza `tiempos_ts` y `tiempos_llin` si ya existen, garantizando consistencia entre el ajuste y las conclusiones finales.
 
 ---
 
