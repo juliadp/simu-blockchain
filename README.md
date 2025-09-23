@@ -51,8 +51,6 @@ simu-blockchain/
 │   ├── metricas_bar.png             # Barras con métricas finales
 │   ├── saldo_vendedor_tiempo.png    # Evolución del saldo del vendedor
 │   ├── dist_saldos_compradores.png  # Histograma de saldos post-compra (si aplica)
-│   ├── ajustes_fdp.csv              # Resumen de ajustes FDP (TS y LLIN) desde eventos simulados
-│   ├── ajustes_fdp.json             # Igual que CSV, en formato JSON
 │   ├── ajustes_fdp_dataset.csv      # Ajustes FDP estimados directamente del dataset (en horas)
 │   ├── ajustes_fdp_dataset.json     # Igual que CSV, en formato JSON
 │   └── conclusiones.md              # Conclusiones automáticas de la corrida
