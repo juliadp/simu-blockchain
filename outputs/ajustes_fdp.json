@@ -1,0 +1,18 @@
+[
+  {
+    "variable": "TS",
+    "mejor_dist": "weibull_min",
+    "params_json": "{\"c\": 1.1282447006546452, \"loc\": 0.018909772875685772, \"scale\": 9.086973897378504}",
+    "n_muestras": 353,
+    "media_muestras": 8.715215936452463,
+    "mediana_muestras": 6.65964647481951
+  },
+  {
+    "variable": "LLIN",
+    "mejor_dist": "weibull_min",
+    "params_json": "{\"c\": 0.7840315497678993, \"loc\": 0.005537420375929968, \"scale\": 16.664364442244896}",
+    "n_muestras": 153,
+    "media_muestras": 20.082814212211858,
+    "mediana_muestras": 10.222587133905677
+  }
+]

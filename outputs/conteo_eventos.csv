@@ -1,7 +1,6 @@
 evento,frecuencia
-mint,359
-compra_exitosa,138
-actualizacion_precio,29
-compra_fallida_fondos,15
-burn_token,10
+mint,354
+compra_exitosa,153
+actualizacion_precio,34
+burn_token,12
 compra_fallida_sin_tokens,1
