@@ -25,6 +25,7 @@ El objetivo es analizar el **ritmo de oferta vs demanda**, la evolución del **s
   - [📂 Estructura del Proyecto](#-estructura-del-proyecto)
   - [🧩 Configuración y Requisitos](#-configuración-y-requisitos)
   - [🚀 Ejecución Rápida](#-ejecución-rápida)
+  - [FDPs desde el dataset (TS/LLIN)](#fdps-desde-el-dataset-tsllin)
   - [🔁 Flujo de la Simulación](#-flujo-de-la-simulación)
   - [📊 Métricas Principales](#-métricas-principales)
   - [🧾 Salidas y Resultados](#-salidas-y-resultados)
@@ -50,8 +51,10 @@ simu-blockchain/
 │   ├── metricas_bar.png             # Barras con métricas finales
 │   ├── saldo_vendedor_tiempo.png    # Evolución del saldo del vendedor
 │   ├── dist_saldos_compradores.png  # Histograma de saldos post-compra (si aplica)
-│   ├── ajustes_fdp.csv              # Resumen de ajustes FDP (TS y LLIN)
+│   ├── ajustes_fdp.csv              # Resumen de ajustes FDP (TS y LLIN) desde eventos simulados
 │   ├── ajustes_fdp.json             # Igual que CSV, en formato JSON
+│   ├── ajustes_fdp_dataset.csv      # Ajustes FDP estimados directamente del dataset (en horas)
+│   ├── ajustes_fdp_dataset.json     # Igual que CSV, en formato JSON
 │   └── conclusiones.md              # Conclusiones automáticas de la corrida
 │
 └── .gitignore                       # Ignora cachés, checkpoints y temporales
@@ -83,13 +86,43 @@ Los resultados se guardan en `outputs/`.
 
 ---
 
+## FDPs desde el dataset (TS/LLIN)
+
+Este proyecto estima las **FDPs** de los intervalos **TS** (Δ entre tokenizaciones `mint`) y **LLIN** (Δ entre llegadas de interesados) **directamente desde el dataset de escenarios** (`df_scenarios`), y luego la simulación puede usar esos generadores.
+
+- Librería: [`fitter`](https://github.com/cokelaer/fitter) con **todas** las distribuciones disponibles, criterio **SSE** (sum of squared errors).
+- **Unidad**: se trabaja en **horas**.
+
+**Dónde corre:** en el Colab, bloque “2.1 FDPs TS/LLIN desde el dataset”, después de cargar `df_scenarios`.
+
+**Entradas del dataset → en horas:**
+- `mint_delay_min` (minutos) → **TS** = `mint_delay_min / 60`
+- `potential_buyer_arrival_delay_time` (horas) → **LLIN** = `potential_buyer_arrival_delay_time`
+
+**Selector de tamaño de muestra:**
+- `USE_N_ROWS`: número de filas a utilizar (o `None` para todas).
+- `USE_RANDOM_SAMPLE`: `True` = muestra aleatoria reproducible, `False` = primeras N.
+- `RANDOM_SEED`: semilla para la muestra aleatoria.
+
+**Salidas:**
+- `outputs/ajustes_fdp_dataset.csv`
+- `outputs/ajustes_fdp_dataset.json`
+  - Campos: `variable`, `mejor_dist`, `params_json`, `n`, `unidad_tiempo=horas`
+
+**Integración con la simulación (opcional):**
+Si hay ajuste, se exponen `gen_TS_dataset` y `gen_LLIN_dataset` (en horas).  
+`simular_escenario` los usa automáticamente si existen; si no, cae a exponenciales con medias del escenario.
+
+---
+
 ## 🔁 Flujo de la Simulación
-- **Unidad de tiempo:** **días**  
-- **TS (intervalo entre tokenizaciones):** calculado en la serie `tiempos_ts`  
-- **LLIN (intervalo entre llegadas de interesados):** calculado en la serie `tiempos_llin`  
-mediana ≈ **12.2 días**  
-- **Eventos secundarios:** gaps `Exponencial` con media ≈ **3 días**  
-- **Estados/Costos:** gasto de gas, saldo del vendedor, precios aleatorios de tokens, KYC del comprador, etc.
+- **Unidad de tiempo:** **horas**  
+- **TS (intervalo entre mints):** por defecto Exponencial con media = `mint_delay_min / 60`.  
+  - Si existen FDPs del dataset (bloque 2.1), usa `gen_TS_dataset` (horas).
+- **LLIN (intervalo entre llegadas):** por defecto Exponencial con media = `potential_buyer_arrival_delay_time` (horas).  
+  - Si existen FDPs del dataset, usa `gen_LLIN_dataset` (horas).
+- **Eventos secundarios (burn/actualización de precio):** Exponencial con media = `time_to_price_update_days * 24` (horas).
+- **Estados/Costos:** gas, saldo del vendedor, precios aleatorios de tokens, KYC del comprador, etc.
 
 ---
 
@@ -140,7 +173,8 @@ Estas métricas quedan en `outputs/metricas.csv` y se visualizan en `outputs/met
 
 ## 🛠 Guía rápida / Runbook
 1. Correr **Bloque 1 (setup)** y **Bloque 2 (imports)**.  
-2. Definir parámetros y **unidad de tiempo** (ya seteado en **días**).  
+2. Definir parámetros y **unidad de tiempo** (ya seteado en **horas**).
+2. Ejecutar **FDPs desde el dataset** para estimar TS/LLIN y habilitar su uso en la simulación.
 3. Ejecutar **Generación de datos**, **EDA** y **Métricas**.  
 4. Correr **Visualizaciones** y el bloque **Tokens en circulación + Resumen** (unificado) para obtener `tokens_circulacion.csv` y `resumen_tiempo.csv`.  
 5. Ejecutar **Ajuste de FDPs (Fitter)** y la **Verificación**.  

@@ -1,18 +1,18 @@
 [
   {
     "variable": "TS",
-    "mejor_dist": "weibull_min",
-    "params_json": "{\"c\": 1.1282447006546452, \"loc\": 0.018909772875685772, \"scale\": 9.086973897378504}",
+    "mejor_dist": "lognorm",
+    "params_json": "{\"s\": 3.6726901129272167, \"loc\": 0.2227309197187825, \"scale\": 8.17874989662566}",
     "n_muestras": 353,
-    "media_muestras": 8.715215936452463,
-    "mediana_muestras": 6.65964647481951
+    "media_muestras": 109.65690806772172,
+    "mediana_muestras": 75.8120469260084
   },
   {
     "variable": "LLIN",
-    "mejor_dist": "weibull_min",
-    "params_json": "{\"c\": 0.7840315497678993, \"loc\": 0.005537420375929968, \"scale\": 16.664364442244896}",
+    "mejor_dist": "gamma",
+    "params_json": "{\"a\": 0.5855244822463066, \"loc\": 5.3147265958252765, \"scale\": 372.6185390268189}",
     "n_muestras": 153,
-    "media_muestras": 20.082814212211858,
-    "mediana_muestras": 10.222587133905677
+    "media_muestras": 252.8224836249718,
+    "mediana_muestras": 154.0928883190445
   }
 ]
