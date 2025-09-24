@@ -1,20 +1,20 @@
 ## Conclusiones
 
 **Horizonte & Supply**
-- Horizonte simulado: 38806.61 horas (de 70.80 a 38877.40).
-- Supply en circulación al cierre: **342** tokens — tendencia **estable**.
-- PTB (burn): **3.39%** (12/354).
-- Stock sin vender al cierre: **189** tokens.
+- Horizonte simulado: 958.70 horas (de 44.31 a 1003.01).
+- Supply en circulación al cierre: **20** tokens — tendencia **estable**.
+- PTB (burn): **0.00%** (0/20).
+- Stock sin vender al cierre: **20** tokens.
 
 **Ritmos del sistema**
-- Tokenización (TS): media ≈ 12.08 horas — mejor FDP: foldnorm
-- Llegadas (LLIN): media ≈ 23.09 horas — mejor FDP: burr12
+- Tokenización (TS): media ≈ 47.95 horas — mejor FDP: gausshyper
+- Llegadas (LLIN): media ≈ 106.52 horas — mejor FDP: invgauss
 
 **Demanda & Éxito de compras**
-- Compras: 153/154 exitosas (**99.4%**)
-- Fallidas por fondos: 0
+- Compras: 0/10 exitosas (**0.0%**)
+- Fallidas por fondos: 9
 - Fallidas por falta de tokens: 1
 
 **Recomendaciones rápidas**
 - La tokenización (TS) es más rápida que las llegadas (LLIN): el supply se repone bien; revisá **estrategias de precio** si hay fallas por fondos.
-- Las fallas por **falta de tokens** dominan: aumentar frecuencia de `mint` o **reducir `burn`** puede ayudar.
+- Las fallas por **fondos insuficientes** dominan: considerá **bajar `VALOR_TOKEN_MEDIA`** o modificar la distribución de saldos de compradores.
