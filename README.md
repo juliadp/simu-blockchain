@@ -2,7 +2,7 @@
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/juliadp/simu-blockchain/blob/main/TP%20Final%20Simulacion.ipynb)
 
-**⏱ Unidad de tiempo de la simulación: _días_**
+**⏱ Unidad de tiempo de la simulación: _horas_**
 
 ---
 
@@ -43,7 +43,7 @@ simu-blockchain/
 ├── docs/                            # Documentación adicional (opcional)
 │
 ├── outputs/                         # Resultados generados automáticamente
-│   ├── metricas.csv                 # CTS, PTB_% (porcentaje), PSC, CTF
+│   ├── metricas_all.csv             # CTS, PTB_% (porcentaje), PSC, CTF
 │   ├── conteo_eventos.csv           # Frecuencia por tipo de evento
 │   ├── tokens_circulacion.csv       # Serie (tiempo, tokens_en_circulacion)
 │   ├── tokens_circulacion.png       # Curva del supply acumulado
@@ -53,6 +53,8 @@ simu-blockchain/
 │   ├── dist_saldos_compradores.png  # Histograma de saldos post-compra (si aplica)
 │   ├── ajustes_fdp_dataset.csv      # Ajustes FDP estimados directamente del dataset (en horas)
 │   ├── ajustes_fdp_dataset.json     # Igual que CSV, en formato JSON
+|   ├── fdp_ts_top5_overlay.png      # Overlays TS
+|   ├── fdp_llin_top5_overlay.png    # Overlays LLIN
 │   └── conclusiones.md              # Conclusiones automáticas de la corrida
 │
 └── .gitignore                       # Ignora cachés, checkpoints y temporales
@@ -85,98 +87,59 @@ Los resultados se guardan en `outputs/`.
 ---
 
 ## FDPs desde el dataset (TS/LLIN)
+Se estiman **FDPs** para:
+- **TS** (Δ entre `mint`) usando `mint_delay_min / 60` → horas
+- **LLIN** (Δ entre llegadas de interesados) usando `potential_buyer_arrival_delay_time` → horas
 
-Este proyecto estima las **FDPs** de los intervalos **TS** (Δ entre tokenizaciones `mint`) y **LLIN** (Δ entre llegadas de interesados) **directamente desde el dataset de escenarios** (`df_scenarios`), y luego la simulación puede usar esos generadores.
-
-- Librería: [`fitter`](https://github.com/cokelaer/fitter) con **todas** las distribuciones disponibles, criterio **SSE** (sum of squared errors).
-- **Unidad**: se trabaja en **horas**.
-
-**Dónde corre:** en el Colab, bloque “2.1 FDPs TS/LLIN desde el dataset”, después de cargar `df_scenarios`.
-
-**Entradas del dataset → en horas:**
-- `mint_delay_min` (minutos) → **TS** = `mint_delay_min / 60`
-- `potential_buyer_arrival_delay_time` (horas) → **LLIN** = `potential_buyer_arrival_delay_time`
-
-**Selector de tamaño de muestra:**
-- `USE_N_ROWS`: número de filas a utilizar (o `None` para todas).
-- `USE_RANDOM_SAMPLE`: `True` = muestra aleatoria reproducible, `False` = primeras N.
-- `RANDOM_SEED`: semilla para la muestra aleatoria.
-
-**Salidas:**
-- `outputs/ajustes_fdp_dataset.csv`
-- `outputs/ajustes_fdp_dataset.json`
-  - Campos: `variable`, `mejor_dist`, `params_json`, `n`, `unidad_tiempo=horas`
-
-**Integración con la simulación (opcional):**
-Si hay ajuste, se exponen `gen_TS_dataset` y `gen_LLIN_dataset` (en horas).  
-`simular_escenario` los usa automáticamente si existen; si no, cae a exponenciales con medias del escenario.
+**Toolkit:** [`fitter`](https://github.com/cokelaer/fitter) probando **todas** las distribuciones y eligiendo por **SSE**.  
+**Salidas:** `outputs/ajustes_fdp_dataset.csv` y `.json`.  
+**Integración:** si hay ajuste, se definen **`gen_TS_dataset`** y **`gen_LLIN_dataset`** (horas) y la simulación los usa automáticamente; si no, cae a **Exponencial** con medias del escenario.  
+**Opcional:** overlays Top-N PDFs (controlado por `TOP_N_FDPS`).
 
 ---
 
 ## 🔁 Flujo de la Simulación
-- **Unidad de tiempo:** **horas**  
-- **TS (intervalo entre mints):** por defecto Exponencial con media = `mint_delay_min / 60`.  
-  - Si existen FDPs del dataset (bloque 2.1), usa `gen_TS_dataset` (horas).
-- **LLIN (intervalo entre llegadas):** por defecto Exponencial con media = `potential_buyer_arrival_delay_time` (horas).  
-  - Si existen FDPs del dataset, usa `gen_LLIN_dataset` (horas).
-- **Eventos secundarios (burn/actualización de precio):** Exponencial con media = `time_to_price_update_days * 24` (horas).
-- **Estados/Costos:** gas, saldo del vendedor, precios aleatorios de tokens, KYC del comprador, etc.
+- **Tiempo base:** **horas**.
+- **TS:** Exponencial(media = `mint_delay_min/60`) o mejor FDP del dataset.
+- **LLIN:** Exponencial(media = `potential_buyer_arrival_delay_time`) o mejor FDP del dataset.
+- **Secundarios:** Exponencial(media = `time_to_price_update_days * 24`).
+- **Estados:** supply, `gas`, KYC, budgets/precios ~ normales con ruido, burns y price updates.
 
 ---
 
 ## 📊 Métricas Principales
-- **CTS** — Cantidad total de tokenizaciones solicitadas (mints).  
-- **PTB_%** — Porcentaje de tokens quemados sobre emitidos.  
-- **PSC** — Promedio del saldo de compradores **post-compra**.  
-- **CTF** — Cantidad de transferencias fallidas (por fondos o sin tokens).  
-
-Estas métricas quedan en `outputs/metricas.csv` y se visualizan en `outputs/metricas_bar.png`.
+- **CTS** — # tokenizaciones solicitadas (`mint`)
+- **PTB_%** — % quemados / emitidos
+- **PSC** — saldo promedio post-compra del comprador
+- **CTF** — # transferencias fallidas (fondos/stock) 
 
 ---
 
 ## 🧾 Salidas y Resultados
-- **Conteo de eventos:** `outputs/conteo_eventos.csv`  
-- **Supply en el tiempo:**  
-  - Serie `outputs/tokens_circulacion.csv`  
-  - Gráfico `outputs/tokens_circulacion.png`  
-- **Resumen de tiempo simulado:** `outputs/resumen_tiempo.csv`  
-- **Gráficos clave:**  
-  - `outputs/saldo_vendedor_tiempo.png`  
-  - `outputs/dist_saldos_compradores.png` (si hubo compras)  
-  - `outputs/metricas_bar.png`  
-- **Conclusiones automáticas:** `outputs/conclusiones.md`  
-  (horizonte simulado, supply final y tendencia, tasas de éxito/fallas, recomendaciones)
-
----
-
-- **Ajuste (con `fitter`):**  
-  Se ajustan distribuciones candidatas (`expon`, `gamma`, `lognorm`, `norm`, `weibull_min`) para:
-  - **`tiempos_ts`** (Δ entre mints)  
-  - **`tiempos_llin`** (Δ entre compras)  
-
-  Los mejores ajustes se exportan en:
-  - `outputs/ajustes_fdp.csv`  
-  - `outputs/ajustes_fdp.json`
-
-- **Uso en Conclusiones:**  
-  El bloque 10 reutiliza `tiempos_ts` y `tiempos_llin` si ya existen, garantizando consistencia entre el ajuste y las conclusiones finales.
+- **Ajustes FDP (dataset):** `ajustes_fdp_dataset.csv/json` (+ overlays si `TOP_N_FDPS>0`)
+- **Métricas por escenario (batch):** `metricas_all.csv`
+- **Eventos (opcional, batch):** `eventos_all_sXXX.csv(.gz)` con columna `scenario`
+- **Escenario de referencia (EDA/plots):** `metricas.csv`, `conteo_eventos.csv`, `tokens_circulacion.*`, `*_tiempo.png`, `dist_saldos_compradores.png`
+- **Conclusiones automáticas:** `conclusiones.md`
 
 ---
 
 ## 🎯 Notas de Reproducibilidad
-- Se fijan **semillas** (`numpy` y `random`) para resultados reproducibles.  
-- Los bloques de export son **idempotentes** (no duplican archivos y pueden sobreescribirse).  
+- Se fijan semillas (`numpy`, `random`) para resultados consistentes.
+- Exportes **idempotentes** (sobre-escritura segura).
+- El EDA/plots usa el **primer escenario** del batch para producir gráficos rápidos y representativos sin inflar memoria. 
 
 ---
 
 ## 🛠 Guía rápida / Runbook
-1. Correr **Bloque 1 (setup)** y **Bloque 2 (imports)**.  
-2. Definir parámetros y **unidad de tiempo** (ya seteado en **horas**).
-2. Ejecutar **FDPs desde el dataset** para estimar TS/LLIN y habilitar su uso en la simulación.
-3. Ejecutar **Generación de datos**, **EDA** y **Métricas**.  
-4. Correr **Visualizaciones** y el bloque **Tokens en circulación + Resumen** (unificado) para obtener `tokens_circulacion.csv` y `resumen_tiempo.csv`.  
-5. Ejecutar **Ajuste de FDPs (Fitter)** y la **Verificación**.  
-6. Revisar `outputs/`: métricas, gráficos, ajustes y **conclusiones.md**.  
-7. (Opcional) Subir todo a GitHub (ver `.gitignore`).  
+1. Ejecutar **Setup e Ingesta** (bloques 1–2).  
+2. (Opcional) Ejecutar **ajuste FDPs** — genera `ajustes_fdp_dataset.*` y define `gen_TS_dataset` / `gen_LLIN_dataset`.  
+3. Configurar **Driver**:
+   - `RUN_ALL_SCENARIOS = True`
+   - Para runs grandes: `SAVE_EVENTS_ALL=False`, `SAVE_METRICAS_ALL=True`
+   - Ajustar `N_SCENARIOS`, `BATCH_RANDOM_SAMPLE`, `TOP_N_FDPS`
+4. Correr el **Driver (streaming)**. Verás logs de progreso cada 1000 escenarios.
+5. Revisar `outputs/metricas_all.csv` (batch) y los gráficos/archivos del escenario de referencia.
+6. Ver **conclusiones** en `outputs/conclusiones.md`.
 
 ---
