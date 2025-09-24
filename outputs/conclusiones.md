@@ -7,8 +7,8 @@
 - Stock sin vender al cierre: **189** tokens.
 
 **Ritmos del sistema**
-- Tokenización (TS): media ≈ 12.08 horas — mejor FDP: arcsine
-- Llegadas (LLIN): media ≈ 23.09 horas — mejor FDP: johnsonsb
+- Tokenización (TS): media ≈ 12.08 horas — mejor FDP: foldnorm
+- Llegadas (LLIN): media ≈ 23.09 horas — mejor FDP: burr12
 
 **Demanda & Éxito de compras**
 - Compras: 153/154 exitosas (**99.4%**)

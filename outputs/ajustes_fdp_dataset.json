@@ -1,16 +1,16 @@
 [
   {
     "variable": "TS",
-    "mejor_dist": "arcsine",
-    "params_json": "{\"loc\": 0.22271785461778992, \"scale\": 0.31546116254575196}",
-    "n": 10,
+    "mejor_dist": "foldnorm",
+    "params_json": "{\"c\": 1.7764229085916459, \"loc\": 0.016666598622727194, \"scale\": 0.18211473065476175}",
+    "n": 500,
     "unidad_tiempo": "horas"
   },
   {
     "variable": "LLIN",
-    "mejor_dist": "johnsonsb",
-    "params_json": "{\"a\": -0.47331432273849006, \"b\": 0.07801106876351566, \"loc\": 5.314726595595976, \"scale\": 74.64013798248887}",
-    "n": 10,
+    "mejor_dist": "burr12",
+    "params_json": "{\"c\": 1.5391457740764092, \"d\": 10.484869829341443, \"loc\": 0.8236106665409169, \"scale\": 142.80176923912757}",
+    "n": 500,
     "unidad_tiempo": "horas"
   }
 ]
